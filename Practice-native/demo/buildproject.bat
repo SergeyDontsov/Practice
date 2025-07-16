@@ -87,7 +87,7 @@ REM Компилируем Native код в DLL
 REM =====================
 
 echo Компиляция Native кода...
-gcc -c -O3 -I"%JAVA_INCLUDE_PATH%" -I"%JAVA_INCLUDE_WIN_PATH%" -I"C:\mingw64\include" -o nativeLib.o "%NATIVE_SRC%"
+gcc -c  -O3 -I"%JAVA_INCLUDE_PATH%" -I"%JAVA_INCLUDE_WIN_PATH%" -I"C:\mingw64\include" -o nativeLib.o "%NATIVE_SRC%"
 if %errorlevel% neq 0 (
     echo Ошибка при компиляции Native кода в объектный файл.
     goto end

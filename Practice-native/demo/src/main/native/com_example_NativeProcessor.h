@@ -10,26 +10,26 @@ extern "C" {
 /*
  * Class:     com_example_NativeProcessor
  * Method:    calculateAverage
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Ljava/lang/String;
+ * Signature: (Ljava/util/List;Ljava/lang/String;Ljava/util/List;)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_example_NativeProcessor_calculateAverage
-  (JNIEnv *, jobject, jstring, jstring, jobject);
+  (JNIEnv *, jobject, jobject, jstring, jobject);
 
 /*
  * Class:     com_example_NativeProcessor
  * Method:    calculateMax
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Ljava/lang/String;
+ * Signature: (Ljava/util/List;Ljava/lang/String;Ljava/util/List;)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_example_NativeProcessor_calculateMax
-  (JNIEnv *, jobject, jstring, jstring, jobject);
+  (JNIEnv *, jobject, jobject, jstring, jobject);
 
 /*
  * Class:     com_example_NativeProcessor
  * Method:    countUnique
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Ljava/lang/String;
+ * Signature: (Ljava/util/List;Ljava/lang/String;Ljava/util/List;)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_example_NativeProcessor_countUnique
-  (JNIEnv *, jobject, jstring, jstring, jobject);
+  (JNIEnv *, jobject, jobject, jstring, jobject);
 
 #ifdef __cplusplus
 }

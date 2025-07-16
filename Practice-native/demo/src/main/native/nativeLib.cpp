@@ -6,6 +6,7 @@
 #include <limits>
 #include <future>
 #include "nlohmann/json.hpp"
+#include <execution> // Для параллельных алгоритмов
 
 using json = nlohmann::json;
 
@@ -176,26 +177,54 @@ JNIEXPORT jstring JNICALL Java_com_example_Main_calculateAverage(JNIEnv* env, jo
     return env->NewStringUTF(res_str.c_str());
 }
 
+#include <chrono> // подключаем для измерения времени
+
 // calculateMax
 JNIEXPORT jstring JNICALL Java_com_example_Main_calculateMax(JNIEnv* env, jobject, jstring jsonStr, jstring fieldStr, jobject groupFieldsObj) {
+    
+    auto start_time1 = std::chrono::high_resolution_clock::now(); // старт таймера
+
     const char* json_cstr = env->GetStringUTFChars(jsonStr, nullptr);
     std::string json_input(json_cstr);
     env->ReleaseStringUTFChars(jsonStr, json_cstr);
+
+    auto end_time1 = std::chrono::high_resolution_clock::now(); // конец таймера
+    auto duration1 = std::chrono::duration_cast<std::chrono::microseconds>(end_time1 - start_time1
+    ).count();
+
+    double seconds1 = duration1 / 1000000.0;
+    // Выводим или логируем время
+    printf("Часть 1: %.3f seconds\n", seconds1);
 
     const char* field_cstr = env->GetStringUTFChars(fieldStr, nullptr);
     std::string field_name(field_cstr);
     env->ReleaseStringUTFChars(fieldStr, field_cstr);
 
+
     auto group_fields = getGroupFieldsJNI(env, groupFieldsObj);
 
+
+    auto start_time3 = std::chrono::high_resolution_clock::now(); // старт таймера
+
     auto result = handleData(json_input, group_fields, [&](const json& items) -> json {
-        double max_val = -std::numeric_limits<double>::infinity();
+        std::vector<double> values;
+        values.reserve(items.size());
         for (const auto& item : items) {
             if (item.contains(field_name))
-                max_val = std::max(max_val, get_value_as_double(item, field_name));
+                values.push_back(get_value_as_double(item, field_name));
+            else
+                values.push_back(-std::numeric_limits<double>::infinity());
         }
-        return max_val;
+        if (values.empty()) return -std::numeric_limits<double>::infinity();
+        return *std::max_element(std::execution::par, values.begin(), values.end());
     });
+
+    auto end_time3 = std::chrono::high_resolution_clock::now(); // конец таймера
+    auto duration3 = std::chrono::duration_cast<std::chrono::microseconds>(end_time3 - start_time3).count();
+
+    double seconds3 = duration3 / 1000000.0;
+    // Выводим или логируем время
+    printf("Часть 3: %.3f seconds\n", seconds3);
 
     std::string res_str = result.dump();
     return env->NewStringUTF(res_str.c_str());
