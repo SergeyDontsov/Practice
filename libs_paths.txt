@@ -1,3 +1,0 @@
-C:\Users\1\Documents\Practice-native\demo\libs\jackson-core-2.15.2.jar
-C:\Users\1\Documents\Practice-native\demo\libs\jackson-databind-2.15.2.jar
-C:\Users\1\Documents\Practice-native\demo\libs\jackson-annotations-2.15.2.jar
