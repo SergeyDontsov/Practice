@@ -1,2 +1,0 @@
-Main-Class: com.example.Main
-Class-Path: libs/jackson-annotations-2.15.2.jar libs/jackson-core-2.15.2.jar libs/jackson-databind-2.15.2.jar
