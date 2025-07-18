@@ -128,7 +128,7 @@ REM Запуск JAR файла
 REM =====================
 
 echo Запуск JAR файла...
-java --enable-native-access=ALL-UNNAMED -jar test.jar -a max -f number -g name -d "C:\Users\1\Documents\Practice-native\nabor(group).json"
+java --enable-native-access=ALL-UNNAMED  -jar test.jar -a max -f number -g name -d "C:\Users\1\Documents\Practice-native\nabor(group).json"
 if %errorlevel% neq 0 (
     echo Ошибка при запуске JAR файла.
     goto end

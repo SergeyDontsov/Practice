@@ -9,27 +9,35 @@ extern "C" {
 #endif
 /*
  * Class:     com_example_NativeProcessor
- * Method:    calculateAverage
- * Signature: (Ljava/util/List;Ljava/lang/String;Ljava/util/List;)Ljava/lang/String;
+ * Method:    initNativeLib
+ * Signature: ()V
  */
-JNIEXPORT jstring JNICALL Java_com_example_NativeProcessor_calculateAverage
-  (JNIEnv *, jobject, jobject, jstring, jobject);
+JNIEXPORT void JNICALL Java_com_example_NativeProcessor_initNativeLib
+  (JNIEnv *, jclass);
 
 /*
  * Class:     com_example_NativeProcessor
- * Method:    calculateMax
- * Signature: (Ljava/util/List;Ljava/lang/String;Ljava/util/List;)Ljava/lang/String;
+ * Method:    calcAverage
+ * Signature: ([DI)D
  */
-JNIEXPORT jstring JNICALL Java_com_example_NativeProcessor_calculateMax
-  (JNIEnv *, jobject, jobject, jstring, jobject);
+JNIEXPORT jdouble JNICALL Java_com_example_NativeProcessor_calcAverage
+  (JNIEnv *, jclass, jdoubleArray, jint);
+
+/*
+ * Class:     com_example_NativeProcessor
+ * Method:    calcMax
+ * Signature: ([DI)D
+ */
+JNIEXPORT jdouble JNICALL Java_com_example_NativeProcessor_calcMax
+  (JNIEnv *, jclass, jdoubleArray, jint);
 
 /*
  * Class:     com_example_NativeProcessor
  * Method:    countUnique
- * Signature: (Ljava/util/List;Ljava/lang/String;Ljava/util/List;)Ljava/lang/String;
+ * Signature: ([Ljava/lang/String;I)I
  */
-JNIEXPORT jstring JNICALL Java_com_example_NativeProcessor_countUnique
-  (JNIEnv *, jobject, jobject, jstring, jobject);
+JNIEXPORT jint JNICALL Java_com_example_NativeProcessor_countUnique
+  (JNIEnv *, jclass, jobjectArray, jint);
 
 #ifdef __cplusplus
 }

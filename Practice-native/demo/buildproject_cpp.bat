@@ -15,7 +15,6 @@ set LIBS_PATH=%BASE_DIR%\libs
 
 REM Пути к исходным файлам Java
 set JAVA_SRC_MAIN=%SRC_DIR%\main\java\com\example\Main.java
-set JAVA_SRC_PARSER=%SRC_DIR%\main\java\com\example\JsonParsery.java
 set JAVA_SRC_NATIVE=%SRC_DIR%\main\java\com\example\NativeProcessor.java
 
 REM Пути к Native исходникам
@@ -46,10 +45,11 @@ set CLASSPATH=%LIBS_PATH%\gson-2.10.1.jar;%LIBS_PATH%\jackson-databind-2.15.2.ja
 REM =====================
 REM Удаление старых файлов
 REM =====================
-echo Удаление старых файлов и папок...
+echo Удаление старых файлов классов...
 
 if exist "%CLASSES_DIR%" (
-    rmdir /s /q "%CLASSES_DIR%"
+    REM Удаляем только *.class файлы, чтобы не удалять структуру папок
+    for /r "%CLASSES_DIR%" %%f in (*.class) do del "%%f"
 )
 
 if exist "%JAR_NAME%" (
@@ -61,12 +61,12 @@ if exist "%DLL_FULL_PATH%" (
 )
 
 REM =====================
-REM Создаём папки
+REM Создаём папки, если их нет
 REM =====================
 if not exist "%CLASSES_DIR%" mkdir "%CLASSES_DIR%"
 
 REM =====================
-REM Компилируем файлы Java по отдельности
+REM Компиляция Java файлов по отдельности
 REM =====================
 
 echo Компиляция Profiler.java...
@@ -83,22 +83,6 @@ if %errorlevel% neq 0 (
     goto end
 )
 
-echo Компиляция DataConverter.java...
-javac -cp %CLASSPATH% -d "%OUT_DIR%" "%SRC_PATH%\com\example\DataConverter.java"
-if %errorlevel% neq 0 (
-    echo Ошибка при компиляции DataConverter.java
-    goto end
-)
-
-
-echo Компиляция JsonParsery.java...
-javac -cp %CLASSPATH% -d "%OUT_DIR%" "%SRC_PATH%\com\example\JsonParsery.java"
-if %errorlevel% neq 0 (
-    echo Ошибка при компиляции JsonParsery.java
-    goto end
-)
-
-
 echo Компиляция Main.java...
 javac -cp "%CLASSPATH%;%OUT_DIR%" -d "%OUT_DIR%" "C:\Users\1\Documents\Practice-native\demo\src\main\java\com\example\Main.java"
 if %errorlevel% neq 0 (
@@ -106,12 +90,11 @@ if %errorlevel% neq 0 (
     goto end
 )
 
-
 REM =====================
-REM Генерируем JNI заголовки
+REM Генерация JNI заголовков
 REM =====================
 echo Генерация JNI заголовков...
-javac -cp "%CLASSPATH%;%OUT_DIR%" -h "C:\Users\1\Documents\Practice-native\demo\src\main\native" "%JAVA_SRC_MAIN%" "%JAVA_SRC_PARSER%" "%JAVA_SRC_NATIVE%"
+javac -cp "%CLASSPATH%;%OUT_DIR%" -h "%SRC_DIR%\main\native" "%JAVA_SRC_MAIN%" "%JAVA_SRC_NATIVE%"
 if %errorlevel% neq 0 (
     echo Ошибка при генерации JNI заголовков.
     goto end
@@ -121,7 +104,7 @@ REM =====================
 REM Компиляция Native кода (.cpp) в объектный файл
 REM =====================
 echo Компиляция Native C++ кода...
-g++ -O3  -c -I"%JAVA_INCLUDE_PATH%"  -I"C:\Users\1\Documents\Practice-native\demo\json\include" -I"%JAVA_INCLUDE_WIN_PATH%" -I"C:\msys64\mingw64\include" -o nativeLib.o "%NATIVE_SRC%"
+g++ -O3 -std=c++20 -c -I"%JAVA_INCLUDE_PATH%" -I"C:\Users\1\Documents\Practice-native\demo\json\include" -I"%JAVA_INCLUDE_WIN_PATH%" -I"C:\msys64\mingw64\include" -o nativeLib.o "%NATIVE_SRC%"
 if %errorlevel% neq 0 (
     echo Ошибка при компиляции Native C++ кода в объектный файл.
     goto end
@@ -148,7 +131,7 @@ echo Class-Path: libs/gson-2.10.1.jar libs/jackson-databind-2.15.2.jar libs/jack
 ) > "%MANIFEST_FILE%"
 
 REM =====================
-REM Создаем JAR файл
+REM Создаём JAR файл
 REM =====================
 echo Создаем JAR файл...
 jar cfm "%JAR_NAME%" "%MANIFEST_FILE%" -C "%CLASSES_DIR%" .
@@ -161,7 +144,7 @@ REM =====================
 REM Запуск JAR файла
 REM =====================
 echo Запуск JAR файла...
-java --enable-native-access=ALL-UNNAMED -jar "%JAR_NAME%" -a max -f number -g name -d "C:\Users\1\Documents\Practice-native\nabor(group).json"
+java --enable-native-access=ALL-UNNAMED -XX:StartFlightRecording=duration=60s,settings=profile,filename=recording.jfr -jar "%JAR_NAME%" -a max -f number -g name -d "C:\Users\1\Documents\Practice-native\nabor(group).json"
 if %errorlevel% neq 0 (
     echo Ошибка при запуске JAR.
     goto end

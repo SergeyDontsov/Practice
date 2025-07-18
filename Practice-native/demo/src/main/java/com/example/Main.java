@@ -1,131 +1,166 @@
 package com.example;
 
-import java.io.BufferedReader;
+import com.google.gson.*;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
+import java.io.Reader;
+import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.example.Profiler;
 
 
 public class Main {
+    static class ResultItem {
+        long result;
+        String name;
+        
+        ResultItem(long result, String name) {
+            this.result = result;
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("{result=%d, name=%s}", result, name);
+        }
+    }
+    
+    static JsonArray loadJsonArray(String filename) throws IOException {
+        try (Reader reader = Files.newBufferedReader(Paths.get(filename))) {
+            JsonElement jsonElement = JsonParser.parseReader(reader);
+            if (!jsonElement.isJsonArray())
+                throw new IllegalArgumentException("Файл JSON должен содержать массив объектов.");
+            
+            return jsonElement.getAsJsonArray();
+        }
+    }
+
+
+        static void processJsonStream(String filename, Map<String, List<Double>> dataByName) throws IOException {
+        try (JsonReader reader = new JsonReader(new FileReader(filename))) {
+            reader.beginArray();
+            while (reader.hasNext()) {
+                reader.beginObject();
+                String name = null;
+                Double number = null;
+
+                while (reader.hasNext()) {
+                    String key = reader.nextName();
+                    switch (key) {
+                        case "name":
+                            name = reader.nextString();
+                            break;
+                        case "number":
+                            if (reader.peek() == JsonToken.NULL) {
+                                reader.nextNull();
+                            } else {
+                                number = reader.nextDouble();
+                            }
+                            break;
+                        default:
+                            reader.skipValue(); // Пропускаем неизвестные поля
+                    }
+                }
+                reader.endObject();
+
+                if (name != null && number != null) {
+                    dataByName.computeIfAbsent(name, k -> new ArrayList<>()).add(number);
+                }
+            }
+            reader.endArray();
+        }
+    }
+
+    static Map<String, double[]> loadData(String filename) throws IOException {
+        Map<String, List<Double>> tempDataByName = new HashMap<>(); // Временная мапа для сбора списков
+        processJsonStream(filename, tempDataByName); // Читаем JSON в списки
+        Map<String, double[]> dataByName = new HashMap<>();
+
+        for (Map.Entry<String, List<Double>> entry : tempDataByName.entrySet()) {
+            String name = entry.getKey();
+            List<Double> values = entry.getValue();
+            double[] arrayValues = new double[values.size()];
+            for (int j = 0; j < values.size(); j++) {
+                arrayValues[j] = values.get(j);
+            }
+            dataByName.put(name, arrayValues);
+        }
+
+        return dataByName;
+    }
+
+    static native void initNativeLib();
+    static native double calcAverage(double[] data, int length);
+    static native double calcMax(double[] data, int length);
+    static native int countUnique(double[] data, int length);  // Изменено на массив примитивов
+
     static {
-        // Загрузка нативной библиотеки
         System.load("C:\\Users\\1\\Documents\\Practice-native\\demo\\aggregation.dll");
     }
 
-    // Объявление нативных методов
-    public native String calculateAverage(String jsonData, String field, List<String> groupFields);
-    public native String calculateMax(String jsonData, String field, List<String> groupFields);
-    public native String countUnique(String jsonData, String field, List<String> groupFields);
-
-    public static void main(String[] args) throws Exception {
-        
-        Profiler profiler = new Profiler();
+ public static void main(String[] args) throws Exception {
+        String filename = null;
         String aggregation = null;
         String field = null;
-        String[] groupFields = null;
-        String dataFile = null;
+        Profiler profiler = new Profiler();
 
-        // Обработка аргументов командной строки
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
-                case "-a":
-                    aggregation = args[++i];
-                    break;
-                case "-f":
-                    field = args[++i];
-                    break;
-                case "-g":
-                    // Обработка нескольких группировочных полей
-                    int gCount = 0;
-                    int startIdx = i + 1;
-                    while (startIdx < args.length && !args[startIdx].startsWith("-")) {
-                        gCount++;
-                        startIdx++;
-                    }
-                    groupFields = new String[gCount];
-                    for (int j = 0; j < gCount; j++) {
-                        groupFields[j] = args[i + 1 + j];
-                    }
-                    i += gCount; // пропускаем обработанные аргументы
-                    break;
-                case "-d":
-                    dataFile = args[++i];
-                    break;
-                default:
+                case "-d": filename = args[++i]; break;
+                case "-a": aggregation = args[++i]; break;
+                case "-f": field = args[++i]; break;
+                case "-g": // Группировка не обрабатывается
                     break;
             }
         }
 
-        if (aggregation == null || field == null || dataFile == null) {
-            System.err.println("Usage: java -jar <app_name>.jar -a <aggregation> -f <field> [-g <group_fields>] -d <data.json>");
+        if (filename == null || aggregation == null || field == null) {
+            System.err.println("Ошибка! Используйте параметры: -d <файл> -a <агрегация> -f <поле> [-g <группировка>]");
             return;
         }
 
-        profiler.stopAndReport("Профилирование 1:");
+        // Замените loadJsonArray вызовом loadData
+        Map<String, double[]> dataByName = loadData(filename);
 
-        // Чтение JSON файла
-        String jsonData = readFileAsString(dataFile);
+        initNativeLib();
+        List<ResultItem> results = new ArrayList<>();
 
+        for (Map.Entry<String, double[]> entry : dataByName.entrySet()) {
+            String name = entry.getKey();
+            double[] arrayValues = entry.getValue();
 
-        profiler.stopAndReport("Профилирование 2:");
+            switch (aggregation) {
+                case "max":
+                    double maxVal = calcMax(arrayValues, arrayValues.length);
+                    results.add(new ResultItem((long) Math.round(maxVal), name));
+                    break;
 
-        // Вызов нативных методов
-        Main nativeLib = new Main();
-        String resultStr = null;
+                case "average":
+                    double average = calcAverage(arrayValues, arrayValues.length);
+                    results.add(new ResultItem((long) Math.round(average), name));
+                    break;
 
-        // Перед условными блоками подготовьте список groupFields
-        List<String> groupFieldsList = (groupFields != null) ? Arrays.asList(groupFields) : Collections.emptyList();
+                case "unique":
+                    int uniqueCount = countUnique(arrayValues, arrayValues.length);
+                    results.add(new ResultItem(uniqueCount, name));
+                    break;
 
-
-        // Используйте switch-case для выбора метода
-        switch (aggregation.toLowerCase()) {
-            case "max":
-                resultStr = nativeLib.calculateMax(jsonData, field, groupFieldsList);
-                break;
-            case "average":
-            case "avg":
-                resultStr = nativeLib.calculateAverage(jsonData, field, groupFieldsList);
-                break;
-            case "count_unique":
-            case "unique":
-                resultStr = nativeLib.countUnique(jsonData, field, groupFieldsList);
-                break;
-            default:
-                System.err.println("Unknown aggregation type");
-                return;
+                default:
+                    System.err.println("Агрегация '" + aggregation + "' неизвестна!");
+            }
         }
+
+        for (ResultItem item : results) {
+            System.out.println(item);
+        }
+
         profiler.stopAndReport("Профилирование 3:");
-
-        // Обратный парсинг результата
-        Gson gson1 = new Gson();
-        Type listType1 = new TypeToken<List<Map<String, Object>>>(){}.getType();
-        List<Map<String, Object>> results = gson1.fromJson(resultStr, listType1);
-
-        profiler.stopAndReport("Профилирование 4:");
-
-        // Вывод результатов
-        System.out.println("Результат агрегации:");
-        for (Map<String, Object> item : results) {
-            System.out.printf("{max=%s, name=%s}\n", item.get("result"), item.get("group"));
-        }
-
-        profiler.stopAndReport("Профилирование 5:");
-    }
-
-    
-    // Чтение файла
-    private static String readFileAsString(String filename) throws IOException {
-        byte[] fileContent = Files.readAllBytes(Paths.get(filename)); // Быстрое чтение всего файла в байтовый массив
-        return new String(fileContent, StandardCharsets.UTF_8);       // Конвертируем байты в строку UTF-8
     }
 }

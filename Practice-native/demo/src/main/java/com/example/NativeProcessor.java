@@ -8,7 +8,14 @@ public class NativeProcessor {
         System.load("C:\\Users\\1\\Documents\\Practice-native\\demo\\aggregation.dll"); // Загрузка нативной библиотеки
     }
 
-    public native String calculateAverage(List<Map<String, Object>> jsonData, String field, List<String> groupFields);
-    public native String calculateMax(List<Map<String, Object>> jsonData, String field, List<String> groupFields);
-    public native String countUnique(List<Map<String, Object>> jsonData, String field, List<String> groupFields);
+
+    // Вызов нативных функций
+    static native void initNativeLib();
+
+    static native double calcAverage(double[] data, int length);
+
+    static native double calcMax(double[] data, int length);
+
+    static native int countUnique(String[] data, int length);
+
 }

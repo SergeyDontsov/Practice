@@ -9,27 +9,35 @@ extern "C" {
 #endif
 /*
  * Class:     com_example_Main
- * Method:    calculateAverage
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Ljava/lang/String;
+ * Method:    initNativeLib
+ * Signature: ()V
  */
-JNIEXPORT jstring JNICALL Java_com_example_Main_calculateAverage
-  (JNIEnv *, jobject, jstring, jstring, jobject);
+JNIEXPORT void JNICALL Java_com_example_Main_initNativeLib
+  (JNIEnv *, jclass);
 
 /*
  * Class:     com_example_Main
- * Method:    calculateMax
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Ljava/lang/String;
+ * Method:    calcAverage
+ * Signature: ([DI)D
  */
-JNIEXPORT jstring JNICALL Java_com_example_Main_calculateMax
-  (JNIEnv *, jobject, jstring, jstring, jobject);
+JNIEXPORT jdouble JNICALL Java_com_example_Main_calcAverage
+  (JNIEnv *, jclass, jdoubleArray, jint);
+
+/*
+ * Class:     com_example_Main
+ * Method:    calcMax
+ * Signature: ([DI)D
+ */
+JNIEXPORT jdouble JNICALL Java_com_example_Main_calcMax
+  (JNIEnv *, jclass, jdoubleArray, jint);
 
 /*
  * Class:     com_example_Main
  * Method:    countUnique
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Ljava/lang/String;
+ * Signature: ([DI)I
  */
-JNIEXPORT jstring JNICALL Java_com_example_Main_countUnique
-  (JNIEnv *, jobject, jstring, jstring, jobject);
+JNIEXPORT jint JNICALL Java_com_example_Main_countUnique
+  (JNIEnv *, jclass, jdoubleArray, jint);
 
 #ifdef __cplusplus
 }

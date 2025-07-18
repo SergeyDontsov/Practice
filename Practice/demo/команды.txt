@@ -1,0 +1,28 @@
+C:\Users\1\Documents\Repos_git\Practice_ver_one>git push -u origin main
+branch 'main' set up to track 'origin/main'.
+Everything up-to-date
+
+C:\Users\1\Documents\Repos_git\Practice_ver_one>git add .
+warning: in the working copy of 'Practice-native/.vscode/c_cpp_properties.json', LF will be replaced by CRLF the next time Git touches it
+
+C:\Users\1\Documents\Repos_git\Practice_ver_one>git commit -m "Версия 2"
+[main 7c3276c] Версия 2
+ 15 files changed, 103 insertions(+), 11 deletions(-)
+ create mode 100644 Practice-native/.vscode/launch.json
+ create mode 100644 Practice-native/.vscode/tasks.json
+ create mode 100644 Practice-native/nabor(count).json
+ create mode 100644 Practice-native/nabor.json
+
+C:\Users\1\Documents\Repos_git\Practice_ver_one>git push -u origin main
+Enumerating objects: 60, done.
+Counting objects: 100% (60/60), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (23/23), done.
+Writing objects: 100% (33/33), 109.17 KiB | 2.87 MiB/s, done.
+Total 33 (delta 13), reused 4 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (13/13), completed with 13 local objects.
+To https://github.com/SergeyDontsov/Practice_ver_one.git
+   993201f..7c3276c  main -> main
+branch 'main' set up to track 'origin/main'.
+
+C:\Users\1\Documents\Repos_git\Practice_ver_one>

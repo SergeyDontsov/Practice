@@ -1,43 +1,30 @@
 #include <jni.h>
-#include "com_example_Main.h"  // или другой соответствующий заголовок
+#include "com_example_Main.h"  // убедитесь, что путь к заголовку правильный
+
 #include <vector>
 #include <string>
-#include "nlohmann/json.hpp"
 
-using json = nlohmann::json;
+// Реализация инициализации библиотеки
+extern "C" {
 
-// Общая функция для парсинга JSON с обработкой ошибок
-json parseJsonOrEmpty(const std::string& str) {
-    try {
-        return json::parse(str);
-    } catch (...) {
-        return json();
-    }
+JNIEXPORT void JNICALL Java_com_example_Main_initNativeLib(JNIEnv * env, jobject obj) {
+    // Здесь можно разместить код инициализации, если нужно
+    // Пока оставим пустым
 }
 
+// Реализация расчета среднего
+JNIEXPORT jdouble JNICALL Java_com_example_Main_calcAverage(JNIEnv * env, jobject obj, jdoubleArray dataArray) {
 
-
-// Заглушка для calculateAverage
-JNIEXPORT jstring JNICALL Java_MyClass_calculateAverage(JNIEnv* env, jobject, jstring jsonStr, jstring fieldStr, jobject groupFieldsObj) {
-    // Можно обработать параметры или просто вернуть фиксированный ответ
-    jstring resultArray;
-    
-
-    return resultArray;
 }
 
-// Заглушка для calculateMax
-JNIEXPORT jstring JNICALL Java_MyClass_calculateMax(JNIEnv* env, jobject, jstring jsonStr, jstring fieldStr, jobject groupFieldsObj) {
-    jstring resultArray;
-    
+// Реализация расчета максимума
+JNIEXPORT jdouble JNICALL Java_com_example_Main_calcMax(JNIEnv * env, jobject obj, jdoubleArray dataArray) {
 
-    return resultArray;
 }
 
-// Заглушка для countUnique
-JNIEXPORT jstring JNICALL Java_MyClass_countUnique(JNIEnv* env, jobject, jstring jsonStr, jstring fieldStr, jobject groupFieldsObj) {
-    jstring resultArray;
-    
+// Реализация подсчета уникальных строк
+JNIEXPORT jint JNICALL Java_com_example_Main_countUnique(JNIEnv * env, jobject obj, jobjectArray stringArray) {
 
-    return resultArray;
 }
+
+} // extern "C"

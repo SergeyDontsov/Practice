@@ -97,7 +97,8 @@
         "typeinfo": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "execution": "cpp"
+        "execution": "cpp",
+        "json.hpp": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
