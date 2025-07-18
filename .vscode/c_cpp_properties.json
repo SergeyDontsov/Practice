@@ -1,0 +1,30 @@
+{
+    "configurations": [
+        {
+            "name": "MinGW64",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/msys64/mingw64/include",
+                "C:/Program Files/Java/jdk-24/include",
+                "C:/Program Files/Java/jdk-24/include/win32",
+                "C:/msys64/mingw64/include/c++/15.1.0/x86_64-w64-mingw32",
+                "C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.1.0/include-fixed",
+                "C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.1.0",
+                "C:/msys64/mingw64/include/c++/15.1.0",
+                "C:/msys64/usr/lib",
+                "C:/Users/1/Documents/Practice-native/demo/json/include/nlohmann"
+            ],
+            "defines": [
+                "_WIN32",
+                "_WINDOWS",
+                "_MINGW",
+                "_MINGW64"
+            ],
+            "compilerPath": "C:/msys64/mingw64/bin/g++.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}
