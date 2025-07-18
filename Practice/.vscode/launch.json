@@ -13,5 +13,14 @@
   "group": {
     "kind": "build",
     "isDefault": false
-  }
+  },
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Attach to Java Process",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": 5005
+    }
+  ]
 }
